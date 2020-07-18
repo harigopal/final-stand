@@ -1,16 +1,33 @@
 {
-  "name": "svc",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "final-stand",
+  "version": "0.1.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "fmt": "bsc -fmt src/index.res > src/index.resf; rm src/index.res; mv src/index.resf src/index.res",
+    "build": "bsb -make-world",
+    "compile": "bsb -make-world -w -ws _ ",
+    "clean": "bsb -clean-world",
+    "webpack": "webpack-dev-server"
   },
-  "keywords": [],
+  "keywords": [
+    "BuckleScript",
+    "ReasonReact",
+    "reason-react"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "node-ts": "^5.0.6",
-    "typescript": "^3.9.7"
+    "react": "^16.8.1",
+    "react-dom": "^16.8.1",
+    "reason-react": ">=0.7.1"
+  },
+  "devDependencies": {
+    "@babel/core": "7.10.5",
+    "@babel/preset-env": "7.10.4",
+    "babel-loader": "8.1.0",
+    "bs-platform": "^8.1.1",
+    "moduleserve": "^0.9.0",
+    "webpack": "4.43.0",
+    "webpack-cli": "3.3.12",
+    "webpack-dev-server": "3.11.0"
   }
 }
