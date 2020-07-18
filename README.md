@@ -2,12 +2,11 @@
 
 ```sh
 npm install
-npm run server
-# in a new tab
-npm start
+npm run compile
+npm run webpack
 ```
 
-Open a new web page to `http://localhost:8000/`.
+To reformat `index.res`, run `npm run refmt`.
 
 # Bundle for Production
 
@@ -16,7 +15,6 @@ We've included a convenience `UNUSED_webpack.config.js`, in case you want to shi
 We've also provided a barebone `indexProduction.html`, to serve your bundle.
 
 ```sh
-npm install webpack webpack-cli
 # rename file
 mv UNUSED_webpack.config.js webpack.config.js
 # call webpack to bundle for production

@@ -2,7 +2,7 @@
   "name": "final-stand",
   "version": "0.1.0",
   "scripts": {
-    "fmt": "bsc -fmt src/index.res > src/index.resf; rm src/index.res; mv src/index.resf src/index.res",
+    "refmt": "bsc -fmt src/index.res > src/index.resf; rm src/index.res; mv src/index.resf src/index.res",
     "build": "bsb -make-world",
     "compile": "bsb -make-world -w -ws _ ",
     "clean": "bsb -clean-world",
