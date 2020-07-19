@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "scripts": {
     "res-fmt": "bsc -fmt src/index.re",
-    "build": "bsb -make-world",
+    "deploy": "bsb -clean-world && bsb -make-world && webpack --config webpack.prod.js && cp index.html dist && cd dist && surge --domain https://final-stand.surge.sh",
     "compile": "bsb -make-world -w -ws _ ",
     "clean": "bsb -clean-world",
-    "webpack": "webpack-dev-server"
+    "webpack": "webpack-dev-server --config webpack.dev.js"
   },
   "keywords": [
     "BuckleScript",
