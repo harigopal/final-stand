@@ -47,7 +47,10 @@ module Level = {
     enemies: array(Enemy.t),
   };
 
-  let getEnemies = t => [||];
+  /* So BuckleScript is no longer a "functional" language, since the
+     primary collection is a mutable, reference-based structure. */
+  let getEnemies = t => Array.concat([||], t.enemies);
+
   let make = (~map, ~enemies) => {map, enemies};
 };
 
