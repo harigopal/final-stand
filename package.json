@@ -2,7 +2,7 @@
   "name": "final-stand",
   "version": "0.1.0",
   "scripts": {
-    "refmt": "bsc -fmt src/index.res > src/index.resf; rm src/index.res; mv src/index.resf src/index.res",
+    "res-fmt": "bsc -fmt src/index.re",
     "build": "bsb -make-world",
     "compile": "bsb -make-world -w -ws _ ",
     "clean": "bsb -clean-world",
@@ -16,6 +16,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "bs-webapi": "0.17.1",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
     "reason-react": ">=0.7.1"
@@ -25,6 +26,7 @@
     "@babel/preset-env": "7.10.4",
     "babel-loader": "8.1.0",
     "bs-platform": "^8.1.1",
+    "clean-webpack-plugin": "3.0.0",
     "moduleserve": "^0.9.0",
     "webpack": "4.43.0",
     "webpack-cli": "3.3.12",

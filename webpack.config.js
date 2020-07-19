@@ -1,11 +1,15 @@
 const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   entry: './src/Index.bs.js',
   output: {
-    path: path.join(__dirname, "bundleOutput"),
+    path: path.join(__dirname, "dist"),
     filename: 'index.js',
   },
+  plugins: [
+    new CleanWebpackPlugin(),
+  ],
   module: {
     rules: [
       {
@@ -21,7 +25,7 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: path.join(__dirname, 'bundleOutput'),
+    contentBase: path.join(__dirname),
     compress: true,
     port: 8000
   }
