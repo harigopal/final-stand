@@ -1,13 +1,10 @@
 open Belt;
 
-module WorldTime = {
-  type t = Js.Date.t;
+module Turn = {
+  type t = int;
+  let initial: t = 0;
 
-  let forTick = (i: int) => {
-    let t = Js.Date.make();
-    Js.Date.setSeconds(t, i->float_of_int) |> ignore;
-    t;
-  };
+  let make = (i: int): t => i;
 };
 
 module Position = {
@@ -27,12 +24,12 @@ module Enemy = {
     status,
   }
   and status =
-    | Queued(WorldTime.t)
+    | Queued(Turn.t)
     | Live(Position.t)
     | Dead;
 
-  let make = (~entryTime, ~health, ~wealth) => {
-    {health, wealth, status: Queued(WorldTime.forTick(entryTime))};
+  let make = (~turn, ~health, ~wealth) => {
+    {health, wealth, status: Queued(turn)};
   };
 };
 
@@ -61,7 +58,7 @@ module Tower = {
 
 module World = {
   type t = {
-    startTime: Js.Date.t,
+    turn: Turn.t,
     health: int,
     wealth: int,
     enemies: array(Enemy.t),
@@ -69,7 +66,7 @@ module World = {
   };
 
   let make = (~health, ~wealth, ~level) => {
-    startTime: Js.Date.make(),
+    turn: Turn.make(1),
     health,
     wealth,
     enemies: Level.getEnemies(level),
@@ -97,8 +94,15 @@ module Main = {
   |];
 
   let enemies = [|
-    Enemy.make(~entryTime=1, ~wealth=1, ~health=10),
-    Enemy.make(~entryTime=5, ~wealth=1, ~health=10),
+    Enemy.make(~turn=1, ~wealth=1, ~health=10),
+    Enemy.make(~turn=5, ~wealth=1, ~health=10),
+    Enemy.make(~turn=8, ~wealth=1, ~health=10),
+    Enemy.make(~turn=12, ~wealth=1, ~health=10),
+    Enemy.make(~turn=13, ~wealth=1, ~health=10),
+    Enemy.make(~turn=14, ~wealth=1, ~health=10),
+    Enemy.make(~turn=18, ~wealth=1, ~health=10),
+    Enemy.make(~turn=19, ~wealth=1, ~health=10),
+    Enemy.make(~turn=20, ~wealth=1, ~health=10),
   |];
 
   let level = Level.make(~map, ~enemies);
