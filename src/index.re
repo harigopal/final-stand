@@ -5,6 +5,8 @@ module Turn = {
   let initial: t = 0;
 
   let make = (i: int): t => i;
+
+  let next = t => t + 1;
 };
 
 module Position = {
@@ -72,6 +74,10 @@ module World = {
     enemies: Level.getEnemies(level),
     towers: [||],
   };
+
+  let nextTurn = t => {
+    {...t, turn: Turn.next(t.turn)};
+  };
 };
 
 module Main = {
@@ -106,14 +112,30 @@ module Main = {
   |];
 
   let level = Level.make(~map, ~enemies);
-  let world = World.make(~health=100, ~wealth=8, ~level);
+  let world = ref(World.make(~health=100, ~wealth=8, ~level));
 
   open Webapi.Dom;
   let root = Document.getElementById("root", document) |> Option.getUnsafe;
 
-  Element.setInnerText(
-    root,
-    Js.Json.stringifyAny(world)
-    ->Option.getWithDefault("Could not stringify"),
-  );
+  let domLogElem = Document.createElement("p", document);
+  Element.setId(domLogElem, "logConsole");
+  Element.appendChild(domLogElem, root);
+
+  let render = (world: World.t) => {
+    Element.setInnerText(
+      domLogElem,
+      Js.Json.stringifyAny(world)
+      ->Option.getWithDefault("Could not stringify"),
+    );
+  };
+
+  let incrButton = Document.createElement("button", document);
+  incrButton->Element.setInnerText("Next Turn");
+  incrButton->Element.appendChild(root);
+  incrButton->Element.setOnClick(_evt => {
+    world := World.nextTurn(world^);
+    render(world^);
+  });
+
+  render(world^);
 };
