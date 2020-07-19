@@ -2,15 +2,19 @@ open Belt;
 
 module Turn = {
   type t = int;
-  let initial: t = 0;
+  let initial: t = 1;
 
   let make = (i: int): t => i;
 
   let next = t => t + 1;
+
+  let isSame = (x, y) => x == y;
 };
 
 module Position = {
   type t = int;
+  let next = t => t + 1;
+  let initial: t = 1;
 };
 
 module Tile = {
@@ -32,6 +36,29 @@ module Enemy = {
 
   let make = (~turn, ~health, ~wealth) => {
     {health, wealth, status: Queued(turn)};
+  };
+
+  let tryToIntroduce = (turn: Turn.t, t) => {
+    let status =
+      switch (t.status) {
+      | Live(_)
+      | Dead => t.status
+      | Queued(enemyTurn) =>
+        Turn.isSame(turn, enemyTurn) ? Live(Position.initial) : t.status
+      };
+    {...t, status};
+  };
+
+  let move = t => {
+    {
+      ...t,
+      status:
+        switch (t.status) {
+        | Queued(_)
+        | Dead => t.status
+        | Live(position) => Live(Position.next(position))
+        },
+    };
   };
 };
 
@@ -75,8 +102,29 @@ module World = {
     towers: [||],
   };
 
-  let nextTurn = t => {
-    {...t, turn: Turn.next(t.turn)};
+  let incrementTurn = t => {...t, turn: Turn.next(t.turn)};
+
+  let moveAliveEnemies = t => {
+    {...t, enemies: t.enemies->Array.map(Enemy.move)};
+  };
+  let introduceQueuedEnemies = t => {
+    {...t, enemies: t.enemies->Array.map(Enemy.tryToIntroduce(t.turn))};
+  };
+
+  let runEnemeyTurn = t => {
+    /*
+     * Compute damage to enemies from towers
+     * Kill enemies whose health = 0
+     * Move alive enemies
+     * Appear enemies who're queued for this turn
+     */
+    t
+    ->moveAliveEnemies
+    ->introduceQueuedEnemies;
+  };
+
+  let endPlayerTurn = t => {
+    t->runEnemeyTurn->incrementTurn;
   };
 };
 
@@ -133,7 +181,7 @@ module Main = {
   incrButton->Element.setInnerText("Next Turn");
   incrButton->Element.appendChild(root);
   incrButton->Element.setOnClick(_evt => {
-    world := World.nextTurn(world^);
+    world := World.endPlayerTurn(world^);
     render(world^);
   });
 
