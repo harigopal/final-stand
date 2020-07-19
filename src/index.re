@@ -2,6 +2,7 @@ open Belt;
 
 module WorldTime = {
   type t = Js.Date.t;
+
   let forTick = (i: int) => {
     let t = Js.Date.make();
     Js.Date.setSeconds(t, i->float_of_int) |> ignore;
@@ -20,24 +21,18 @@ module Tile = {
 };
 
 module Enemy = {
-  type vitalStats = {
-    health: int,
-    position: Position.t,
-  };
-
-  type status =
-    | Queued
-    | Live(vitalStats)
-    | Dead(Position.t);
-
   type t = {
-    entryTime: WorldTime.t,
+    health: int,
     wealth: int,
     status,
-  };
+  }
+  and status =
+    | Queued(WorldTime.t)
+    | Live(Position.t)
+    | Dead;
 
-  let make = (~entryTime, ~wealth) => {
-    {entryTime: WorldTime.forTick(entryTime), wealth, status: Queued};
+  let make = (~entryTime, ~health, ~wealth) => {
+    {health, wealth, status: Queued(WorldTime.forTick(entryTime))};
   };
 };
 
@@ -55,7 +50,11 @@ module Level = {
 };
 
 module Tower = {
-  type t =
+  type t = {
+    damage: int,
+    position,
+  }
+  and position =
     | Above(int)
     | Below(int);
 };
@@ -82,14 +81,24 @@ module Main = {
   let map: array(Tile.t) = [|
     Buildable,
     Buildable,
+    Buildable,
+    Buildable,
+    Buildable,
+    Path,
+    Path,
     Path,
     Path,
     Path,
     Buildable,
+    Buildable,
+    Buildable,
+    Buildable,
+    Buildable,
   |];
+
   let enemies = [|
-    Enemy.make(~entryTime=1, ~wealth=1),
-    Enemy.make(~entryTime=5, ~wealth=1),
+    Enemy.make(~entryTime=1, ~wealth=1, ~health=10),
+    Enemy.make(~entryTime=5, ~wealth=1, ~health=10),
   |];
 
   let level = Level.make(~map, ~enemies);
