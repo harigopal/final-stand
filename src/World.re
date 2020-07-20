@@ -1,3 +1,5 @@
+open Belt;
+
 type t = {
   gameState: GameState.t,
   turn: Turn.t,
@@ -26,20 +28,14 @@ let introduceQueuedEnemies = t => {
 };
 
 let receiveDamage = t => {
-  let damaged = ref(false);
+  let totalDamage =
+    Array.reduce(t.enemies, 0, (acc, enemy) =>
+      Enemy.willDealDamage(enemy) ? acc + Enemy.damage(enemy) : acc
+    );
 
-  let enemies =
-    t.enemies
-    |> Js.Array.filter(enemy =>
-         if (Enemy.willDealDamage(enemy)) {
-           damaged := true;
-           false;
-         } else {
-           true;
-         }
-       );
+  let enemies = t.enemies->Array.keep(enemy => !Enemy.willDealDamage(enemy));
 
-  {...t, health: damaged^ ? t.health - 20 : t.health, enemies};
+  {...t, health: t.health - totalDamage, enemies};
 };
 
 let runEnemyTurn = t => {
@@ -57,12 +53,13 @@ let runEnemyTurn = t => {
 
 let refreshGameState = t => {
   let gameState =
-    if (Belt.Array.every(t.enemies, Enemy.isDead)) {
-      GameState.won;
-    } else if (t.health > 0) {
-      GameState.inProgress;
-    } else {
+    /* Order of conditions is significant */
+    if (t.health <= 0) {
       GameState.lost;
+    } else if (Belt.Array.every(t.enemies, Enemy.isDead)) {
+      GameState.won;
+    } else {
+      GameState.inProgress;
     };
 
   {...t, gameState};

@@ -19,15 +19,15 @@ let map: array(Tile.t) = [|
 |];
 
 let enemies = [|
-  Enemy.make(~turn=1, ~wealth=1, ~health=10),
-  Enemy.make(~turn=5, ~wealth=1, ~health=10),
-  Enemy.make(~turn=8, ~wealth=1, ~health=10),
-  Enemy.make(~turn=12, ~wealth=1, ~health=10),
-  Enemy.make(~turn=13, ~wealth=1, ~health=10),
-  Enemy.make(~turn=14, ~wealth=1, ~health=10),
-  Enemy.make(~turn=18, ~wealth=1, ~health=10),
-  Enemy.make(~turn=19, ~wealth=1, ~health=10),
-  Enemy.make(~turn=20, ~wealth=1, ~health=10),
+  Enemy.make(~turn=1, ~wealth=1, ~health=10, ~damage=20),
+  Enemy.make(~turn=5, ~wealth=1, ~health=10, ~damage=10),
+  Enemy.make(~turn=8, ~wealth=1, ~health=10, ~damage=20),
+  Enemy.make(~turn=12, ~wealth=1, ~health=10, ~damage=10),
+  Enemy.make(~turn=13, ~wealth=1, ~health=10, ~damage=20),
+  Enemy.make(~turn=14, ~wealth=1, ~health=10, ~damage=10),
+  Enemy.make(~turn=18, ~wealth=1, ~health=10, ~damage=20),
+  Enemy.make(~turn=19, ~wealth=1, ~health=10, ~damage=20),
+  Enemy.make(~turn=20, ~wealth=1, ~health=10, ~damage=20),
 |];
 
 let level = Level.make(~map, ~enemies);

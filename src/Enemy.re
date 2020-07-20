@@ -1,6 +1,7 @@
 type t = {
   health: int,
   wealth: int,
+  damage: int,
   status,
 }
 and status =
@@ -8,9 +9,11 @@ and status =
   | Live(Position.t)
   | Dead;
 
-let make = (~turn, ~health, ~wealth) => {
-  {health, wealth, status: Queued(turn)};
+let make = (~turn, ~health, ~wealth, ~damage) => {
+  {health, wealth, damage, status: Queued(turn)};
 };
+
+let damage = t => t.damage;
 
 let tryToIntroduce = (turn: Turn.t, t) => {
   let status =
