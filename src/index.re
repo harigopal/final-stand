@@ -15,6 +15,8 @@ module Position = {
   type t = int;
   let next = t => t + 1;
   let initial: t = 1;
+
+  let isOutOfBounds = t => t > 10;
 };
 
 module Tile = {
@@ -66,6 +68,13 @@ module Enemy = {
     | Queued(_)
     | Live(_) => false
     | Dead => true
+    };
+
+  let willDealDamage = t =>
+    switch (t.status) {
+    | Queued(_)
+    | Dead => false
+    | Live(position) => Position.isOutOfBounds(position)
     };
 };
 
@@ -131,6 +140,23 @@ module World = {
     {...t, enemies: t.enemies->Array.map(Enemy.tryToIntroduce(t.turn))};
   };
 
+  let receiveDamage = t => {
+    let damaged = ref(false);
+
+    let enemies =
+      t.enemies
+      |> Js.Array.filter(enemy =>
+           if (Enemy.willDealDamage(enemy)) {
+             damaged := true;
+             false;
+           } else {
+             true;
+           }
+         );
+
+    {...t, health: damaged^ ? t.health - 20 : t.health, enemies};
+  };
+
   let runEnemyTurn = t => {
     /*
      * Compute damage to enemies from towers
@@ -140,6 +166,7 @@ module World = {
      */
     t
     ->moveAliveEnemies
+    ->receiveDamage
     ->introduceQueuedEnemies;
   };
 
@@ -147,10 +174,10 @@ module World = {
     let gameState =
       if (Belt.Array.every(t.enemies, Enemy.isDead)) {
         GameState.won;
-      } else if (t.health == 0) {
-        GameState.lost;
-      } else {
+      } else if (t.health > 0) {
         GameState.inProgress;
+      } else {
+        GameState.lost;
       };
 
     {...t, gameState};
