@@ -60,6 +60,13 @@ module Enemy = {
         },
     };
   };
+
+  let isDead = t =>
+    switch (t.status) {
+    | Queued(_)
+    | Live(_) => false
+    | Dead => true
+    };
 };
 
 module Level = {
@@ -85,8 +92,20 @@ module Tower = {
     | Below(int);
 };
 
+module GameState = {
+  type t =
+    | InProgress
+    | Won
+    | Lost;
+
+  let inProgress = InProgress;
+  let won = Won;
+  let lost = Lost;
+};
+
 module World = {
   type t = {
+    gameState: GameState.t,
     turn: Turn.t,
     health: int,
     wealth: int,
@@ -95,6 +114,7 @@ module World = {
   };
 
   let make = (~health, ~wealth, ~level) => {
+    gameState: GameState.inProgress,
     turn: Turn.make(1),
     health,
     wealth,
@@ -111,7 +131,7 @@ module World = {
     {...t, enemies: t.enemies->Array.map(Enemy.tryToIntroduce(t.turn))};
   };
 
-  let runEnemeyTurn = t => {
+  let runEnemyTurn = t => {
     /*
      * Compute damage to enemies from towers
      * Kill enemies whose health = 0
@@ -123,8 +143,21 @@ module World = {
     ->introduceQueuedEnemies;
   };
 
+  let refreshGameState = t => {
+    let gameState =
+      if (Belt.Array.every(t.enemies, Enemy.isDead)) {
+        GameState.won;
+      } else if (t.health == 0) {
+        GameState.lost;
+      } else {
+        GameState.inProgress;
+      };
+
+    {...t, gameState};
+  };
+
   let endPlayerTurn = t => {
-    t->runEnemeyTurn->incrementTurn;
+    t->runEnemyTurn->refreshGameState->incrementTurn;
   };
 };
 
