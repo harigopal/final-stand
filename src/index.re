@@ -1,5 +1,9 @@
 open Belt;
 
+let numberOfTilesInARow = 5;
+let tileHeight = 20;
+let tileWidth = 20;
+
 let map: array(Tile.t) = [|
   Buildable,
   Buildable,
@@ -36,16 +40,67 @@ let world = ref(World.make(~health=100, ~wealth=8, ~level));
 open Webapi.Dom;
 let root = Document.getElementById("root", document) |> Option.getUnsafe;
 
+let gameWorldDom = Document.createElement("div", document);
+Element.setId(gameWorldDom, "gameWorld");
+Element.appendChild(gameWorldDom, root);
+
 let domLogElem = Document.createElement("p", document);
 Element.setId(domLogElem, "logConsole");
 Element.appendChild(domLogElem, root);
 
+module WorldDomRenderer = {
+  let render = (mapDom, world) => {
+    /*
+     1. Iterate over each tile in the map, and draw accordingly - Buildable/Path.
+     2. Iterate over active Enemies and update their tile
+      */
+
+    Array.forEachWithIndex(
+      map,
+      (i, tile) => {
+        let col = i mod numberOfTilesInARow + 1;
+        let row = i / numberOfTilesInARow + 1;
+
+        let d = Document.createElement("div", document);
+        let className =
+          switch (tile) {
+          | Buildable => "tile-buildable"
+          | Path => "tile-path"
+          };
+
+        let px = i => i->string_of_int ++ "px";
+
+        d->Element.setClassName(className);
+        let htmlElem = d->HtmlElement.ofElement->Option.getUnsafe;
+        let style = htmlElem->HtmlElement.style;
+        style
+        |> CssStyleDeclaration.setProperty(
+             "top",
+             px(row * tileHeight + 100),
+             "",
+           );
+
+        style
+        |> CssStyleDeclaration.setProperty(
+             "left",
+             px(col * tileWidth + 100),
+             "",
+           );
+
+        Element.appendChild(htmlElem, mapDom);
+      },
+    );
+    ();
+  };
+};
 let render = (world: World.t) => {
   Element.setInnerText(
     domLogElem,
     Js.Json.stringifyAny(world)
     ->Option.getWithDefault("Could not stringify"),
   );
+
+  WorldDomRenderer.render(gameWorldDom, world);
 };
 
 let incrButton = Document.createElement("button", document);
