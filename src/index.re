@@ -48,6 +48,20 @@ let domLogElem = Document.createElement("p", document);
 Element.setId(domLogElem, "logConsole");
 Element.appendChild(domLogElem, root);
 
+module FSDom = {
+  let make = (~elem, ~parent, ~className="", ~css=[||]) => {
+    let d = Document.createElement(elem, document);
+    d->Element.setClassName(className);
+    let htmlElem = d->HtmlElement.ofElement->Option.getUnsafe;
+    let style = htmlElem->HtmlElement.style;
+    Array.forEach(css, ((cssProp, cssVal)) => {
+      style |> CssStyleDeclaration.setProperty(cssProp, cssVal, "")
+    });
+    Element.appendChild(htmlElem, parent);
+  };
+};
+let px = i => i->string_of_int ++ "px";
+
 module WorldDomRenderer = {
   let render = (mapDom, world) => {
     /*
@@ -60,34 +74,21 @@ module WorldDomRenderer = {
       (i, tile) => {
         let col = i mod numberOfTilesInARow + 1;
         let row = i / numberOfTilesInARow + 1;
-
-        let d = Document.createElement("div", document);
         let className =
           switch (tile) {
           | Buildable => "tile-buildable"
           | Path => "tile-path"
           };
 
-        let px = i => i->string_of_int ++ "px";
-
-        d->Element.setClassName(className);
-        let htmlElem = d->HtmlElement.ofElement->Option.getUnsafe;
-        let style = htmlElem->HtmlElement.style;
-        style
-        |> CssStyleDeclaration.setProperty(
-             "top",
-             px(row * tileHeight + 100),
-             "",
-           );
-
-        style
-        |> CssStyleDeclaration.setProperty(
-             "left",
-             px(col * tileWidth + 100),
-             "",
-           );
-
-        Element.appendChild(htmlElem, mapDom);
+        FSDom.make(
+          ~elem="div",
+          ~parent=mapDom,
+          ~className,
+          ~css=[|
+            ("top", px(row * tileHeight + 100)),
+            ("left", px(col * tileWidth + 100)),
+          |],
+        );
       },
     );
     ();
