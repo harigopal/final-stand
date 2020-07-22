@@ -68,3 +68,5 @@ let refreshGameState = t => {
 let endPlayerTurn = t => {
   t->runEnemyTurn->refreshGameState->incrementTurn;
 };
+
+let placeTower = (t, i) => {};

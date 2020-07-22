@@ -44,54 +44,19 @@ module FSDom = {
   let make = (~elem, ~parent, ~className="", ~css=[||]) => {
     let d = Document.createElement(elem, document);
     d->Element.setClassName(className);
+
     let htmlElem = d->HtmlElement.ofElement->Option.getUnsafe;
     let style = htmlElem->HtmlElement.style;
+
     Array.forEach(css, ((cssProp, cssVal)) => {
       style |> CssStyleDeclaration.setProperty(cssProp, cssVal, "")
     });
+
     Element.appendChild(htmlElem, parent);
+    htmlElem;
   };
 };
 let px = i => i->string_of_int ++ "px";
-
-module WorldDomRenderer = {
-  let render = (mapDom, world) => {
-    /*
-     1. Iterate over each tile in the map, and draw accordingly - Buildable/Path.
-     2. Iterate over active Enemies and update their tile
-      */
-
-    Array.forEachWithIndex(
-      map,
-      (i, tile) => {
-        let col = i mod numberOfTilesInARow + 1;
-        let row = i / numberOfTilesInARow + 1;
-
-        let className =
-          "tile "
-          ++ (
-            switch (tile) {
-            | Buildable => "tile-buildable"
-            | Path => "tile-path"
-            }
-          );
-
-        FSDom.make(
-          ~elem="div",
-          ~parent=mapDom,
-          ~className,
-          ~css=[|
-            ("width", px(tileWidth - 2)),
-            ("height", px(tileHeight - 2)),
-            ("top", px(row * tileHeight)),
-            ("left", px(col * tileWidth)),
-          |],
-        );
-      },
-    );
-    ();
-  };
-};
 
 let root = Document.getElementById("root", document) |> Option.getUnsafe;
 let gameWorldDom =
