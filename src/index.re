@@ -1,8 +1,9 @@
 open Belt;
 
+let scale = 3;
 let numberOfTilesInARow = 5;
-let tileHeight = 20;
-let tileWidth = 20;
+let tileHeight = 20 * scale;
+let tileWidth = 20 * scale;
 
 let map: array(Tile.t) = [|
   Buildable,
@@ -38,15 +39,6 @@ let level = Level.make(~map, ~enemies);
 let world = ref(World.make(~health=100, ~wealth=8, ~level));
 
 open Webapi.Dom;
-let root = Document.getElementById("root", document) |> Option.getUnsafe;
-
-let gameWorldDom = Document.createElement("div", document);
-Element.setId(gameWorldDom, "gameWorld");
-Element.appendChild(gameWorldDom, root);
-
-let domLogElem = Document.createElement("p", document);
-Element.setId(domLogElem, "logConsole");
-Element.appendChild(domLogElem, root);
 
 module FSDom = {
   let make = (~elem, ~parent, ~className="", ~css=[||]) => {
@@ -74,19 +66,25 @@ module WorldDomRenderer = {
       (i, tile) => {
         let col = i mod numberOfTilesInARow + 1;
         let row = i / numberOfTilesInARow + 1;
+
         let className =
-          switch (tile) {
-          | Buildable => "tile-buildable"
-          | Path => "tile-path"
-          };
+          "tile "
+          ++ (
+            switch (tile) {
+            | Buildable => "tile-buildable"
+            | Path => "tile-path"
+            }
+          );
 
         FSDom.make(
           ~elem="div",
           ~parent=mapDom,
           ~className,
           ~css=[|
-            ("top", px(row * tileHeight + 100)),
-            ("left", px(col * tileWidth + 100)),
+            ("width", px(tileWidth - 2)),
+            ("height", px(tileHeight - 2)),
+            ("top", px(row * tileHeight)),
+            ("left", px(col * tileWidth)),
           |],
         );
       },
@@ -94,9 +92,17 @@ module WorldDomRenderer = {
     ();
   };
 };
+
+let root = Document.getElementById("root", document) |> Option.getUnsafe;
+let gameWorldDom =
+  Document.getElementById("game-world", document) |> Option.getUnsafe;
+let gameControlsDom =
+  Document.getElementById("game-controls", document) |> Option.getUnsafe;
+let logsDom = Document.getElementById("logs", document) |> Option.getUnsafe;
+
 let render = (world: World.t) => {
   Element.setInnerText(
-    domLogElem,
+    logsDom,
     Js.Json.stringifyAny(world)
     ->Option.getWithDefault("Could not stringify"),
   );
@@ -106,7 +112,8 @@ let render = (world: World.t) => {
 
 let incrButton = Document.createElement("button", document);
 incrButton->Element.setInnerText("Next Turn");
-incrButton->Element.appendChild(root);
+incrButton->Element.appendChild(gameControlsDom);
+
 incrButton->Element.setOnClick(_evt => {
   world := World.endPlayerTurn(world^);
   render(world^);

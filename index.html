@@ -1,33 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Final Stand</title>
+    <style>
+      .tile {
+        position: absolute;
+        border: 1px solid gray;
+      }
 
-<head>
-  <meta charset="UTF-8">
-  <title>Final Stand</title>
-  <style>
-    .tile-buildable {
-      background-color: green;
-      width: 18px;
-      height: 18px;
-      position: absolute;
-      border: 1px solid gray;
-    }
+      .tile-buildable {
+        background-color: green;
+      }
 
-    .tile-path {
-      background-color: white;
-      width: 18px;
-      height: 18px;
-      position: absolute;
-      border: 1px solid gray;
-    }
-  </style>
-</head>
+      .tile-path {
+        background-color: white;
+      }
 
-<body>
-  <h1>Final Stand</h1>
-  <div id="root"></div>
+      #root {
+        padding: 1rem;
+        font-family: monospace;
+      }
 
-  <script src="index.js"></script>
-</body>
+      #game-stats {
+        display: flex;
+        justify-content: space-between;
+      }
 
+      #game-world {
+        position: relative;
+        height: 400px;
+      }
+
+      #game-controls {
+        margin-top: 0.5rem;
+      }
+
+      #logs {
+        margin-top: 0.5rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Final Stand</h1>
+    <div id="root">
+      <div id="game-stats"></div>
+      <div id="game-world"></div>
+      <div id="game-controls"></div>
+      <div id="logs"></div>
+    </div>
+
+    <script src="index.js"></script>
+  </body>
 </html>
