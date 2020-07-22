@@ -1,7 +1,7 @@
 open Belt;
 open Webapi.Dom;
 
-let make = (~elem, ~parent, ~className="", ~css=[||]) => {
+let make = (~elem, ~className="", ~css=[||], ~parent) => {
   let d = Document.createElement(elem, document);
   d->Element.setClassName(className);
 
