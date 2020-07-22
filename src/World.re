@@ -18,6 +18,8 @@ let make = (~health, ~wealth, ~level) => {
   towers: [||],
 };
 
+let towers = t => t.towers;
+
 let incrementTurn = t => {...t, turn: Turn.next(t.turn)};
 
 let moveAliveEnemies = t => {
@@ -69,4 +71,11 @@ let endPlayerTurn = t => {
   t->runEnemyTurn->refreshGameState->incrementTurn;
 };
 
-let placeTower = (t, i) => {};
+let placeTower = (t, i) => {
+  let towers =
+    Array.concat(
+      t.towers,
+      [|Tower.make(~damage=50, ~position=Position.make(i))|],
+    );
+  {...t, towers};
+};
